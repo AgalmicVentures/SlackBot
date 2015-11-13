@@ -1,10 +1,31 @@
 #!/usr/bin/env python3
 
+import json
 import random
 import re
+import requests
 import sys
 
 from SlackBot import SlackBot
+
+#TODO: stop duplicating this
+def getAirportData(airport):
+	try:
+		request = requests.get('http://services.faa.gov/airport/status/%s?format=json' % airport)
+		return request.json()
+	except Exception as e:
+		return None
+
+def airportCommand(args):
+	if len(args) == 0:
+		return 'Usage: `airport <CODE>` e.g. `airport LGA`.'
+	else:
+		airport = args[0]
+		airportData = getAirportData(airport)
+		if airportData is None:
+			return 'Error loading data for %s (is the FAA API down?)'
+		else:
+			return '```%s```' % json.dumps(airportData, indent=2)
 
 def rollCommand(n):
 	def roll(args):
@@ -59,6 +80,9 @@ class Bartender(SlackBot.SlackBot):
 					'roll': rollCommand(100),
 
 					'flip': lambda args: ['Heads.' if random.randint(0, 1) == 0 else 'Tails.'],
+
+					'air': airportCommand,
+					'airport': airportCommand,
 				}
 
 				command = commands.get(commandName)
