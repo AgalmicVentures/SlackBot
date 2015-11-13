@@ -54,8 +54,16 @@ class Bartender(SlackBot.SlackBot):
 		strippedTokens = [t for t in re.split(r'\W', text.lower()) if t != '']
 
 		responses = None
-		if isPrivate:
-			if strippedTokens[0] in ['hello', 'hi', 'hey', 'greetings']:
+
+		#Bartender mostly respond to DM's and private chats
+		userDm = self.mentionString() + ': '
+		if isPrivate or text.startswith(userDm):
+			if len(strippedTokens) == 0:
+				responses = [
+					'Cat got your tongue?',
+					'What was that?',
+				]
+			elif strippedTokens[0] in ['hello', 'hi', 'hey', 'greetings']:
 				responses = [
 					'Hello.',
 					'Hello <@%s>.' % userID,
@@ -64,11 +72,10 @@ class Bartender(SlackBot.SlackBot):
 			elif strippedTokens[:3] == ['how', 'are', 'you']:
 				responses = [
 					'Good.',
-					'Doing good.'
+					'Doing good.',
+					'Well, thank you.',
 				]
-		else:
-			userDm = self.mentionString() + ': '
-			if text.startswith(userDm):
+			else:
 				commandName = strippedTokens[1] if len(strippedTokens) > 0 else None
 				commands = {
 					'd3': rollCommand(3),
@@ -97,10 +104,10 @@ class Bartender(SlackBot.SlackBot):
 					arguments = strippedTokens[2:]
 					responses = command(arguments)
 
-			elif self.userID() in event.mentions:
-				responses = [
-					'My ears are burning...',
-				]
+		elif self.userID() in event.mentions:
+			responses = [
+				'My ears are burning...',
+			]
 
 		if responses is not None:
 			self.sendMessage(responses, channel['id'])
