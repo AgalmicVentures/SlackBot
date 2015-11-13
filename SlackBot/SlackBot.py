@@ -12,7 +12,7 @@ class SlackBot:
 		self._translate = translate
 		self._idField = 'name' if translate else 'id'
 
-		self._socket = slacksocket.SlackSocket(token, translate=translate)
+		self.reconnect()
 
 	def token(self):
 		"""
@@ -26,9 +26,31 @@ class SlackBot:
 		"""
 		Returns the bot's user ID.
 
-		:return str
+		:return: str
 		"""
 		return self._socket.user
+
+	def user(self):
+		"""
+		Returns the JSON of the current user.
+
+		:return: dict
+		"""
+		return self.getUser(self.userID())
+
+	def mentionString(self):
+		"""
+		Returns the mention string of the user (@ID).
+
+		:return: str
+		"""
+		return '<@%s>' % self.user()['id']
+
+	def reconnect(self):
+		"""
+		Reconnects to Slack.
+		"""
+		self._socket = slacksocket.SlackSocket(self._token, translate=self._translate)
 
 	def getChannel(self, channelID):
 		"""
@@ -72,7 +94,7 @@ class SlackBot:
 
 		self._socket.send_msg(message, channel_id=channelID)
 
-	def handleEvents(self, delay=0.1):
+	def handleEvents(self):
 		"""
 		Starts an infinite event handling loop.
 		"""

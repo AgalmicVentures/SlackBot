@@ -6,6 +6,11 @@ import sys
 
 from SlackBot import SlackBot
 
+def rollCommand(n):
+	def roll(args):
+		return str(random.randint(1, n))
+	return roll
+
 class Bartender(SlackBot.SlackBot):
 
 	def __init__(self, token):
@@ -41,19 +46,19 @@ class Bartender(SlackBot.SlackBot):
 					'Doing good.'
 				]
 		else:
-			userMention = '<@%s>' % self.userID()
-			userDm = userMention + ': '
+			userDm = self.mentionString() + ': '
 			if text.startswith(userDm):
 				commandName = strippedTokens[1] if len(strippedTokens) > 0 else None
 				commands = {
-					'd3': lambda args: [str(random.randint(1, 3))],
-					'd4': lambda args: [str(random.randint(1, 4))],
-					'd6': lambda args: [str(random.randint(1, 6))],
-					'd10': lambda args: [str(random.randint(1, 10))],
-					'd12': lambda args: [str(random.randint(1, 12))],
-					'd20': lambda args: [str(random.randint(1, 20))],
+					'd3': rollCommand(3),
+					'd4': rollCommand(4),
+					'd6': rollCommand(6),
+					'd10': rollCommand(10),
+					'd12': rollCommand(12),
+					'd20': rollCommand(20),
+					'roll': rollCommand(100),
+
 					'flip': lambda args: ['Heads.' if random.randint(0, 1) == 0 else 'Tails.'],
-					'roll': lambda args: [str(random.randint(1, 100))],
 				}
 
 				command = commands.get(commandName)
@@ -61,13 +66,14 @@ class Bartender(SlackBot.SlackBot):
 					responses = [
 						'What?',
 						'Huh?',
+						'I don\'t understand.',
 						'My responses are limited. You must ask the right questions.',
 					]
 				else:
 					arguments = strippedTokens[2:]
 					responses = command(arguments)
 
-			elif userMention in text:
+			elif self.userID() in event.mentions:
 				responses = [
 					'My ears are burning...',
 				]
