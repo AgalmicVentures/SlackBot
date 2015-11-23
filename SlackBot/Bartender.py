@@ -18,14 +18,34 @@ def getAirportData(airport):
 
 def airportCommand(args):
 	if len(args) == 0:
-		return 'Usage: `airport <CODE>` e.g. `airport LGA`.'
-	else:
-		airport = args[0]
+		return 'Usage: `air <CODE> [<CODE2> ...]` e.g. `air LGA`.'
+
+	responses = []
+	for airport in args:
 		airportData = getAirportData(airport)
 		if airportData is None:
-			return 'Error loading data for %s (is the FAA API down?)'
-		else:
-			return '```%s```' % json.dumps(airportData, indent=2)
+			responses.append('Error loading data for %s (is the FAA API down?)' % airport)
+			break #If the API is broken, no need to club it to death
+
+		try:
+			delay = 'Delay (average): %s - %s' % (
+				airportData['status']['avgDelay'],
+				airportData['status']['reason'],
+			) if airportData['delay'] == 'true' else 'No delay. :thumbsup:'
+
+			header = '*%s*\n' % airport if len(args) > 1 else ''
+			weather = airportData['weather']
+			response = '%sWeather: %s - %s - Wind: %s - Visibility: %s\n%s' % (
+				header,
+				weather['temp'], weather['weather'], weather['wind'], weather['visibility'],
+				delay
+			)
+			responses.append(response)
+		except KeyError:
+			responses.append('Unrecognized format: ```%s```' % json.dumps(airportData, indent=2))
+		#TODO: handle other exceptions?
+
+	return '\n\n'.join(responses)
 
 def rollCommand(n):
 	def roll(args):
@@ -51,17 +71,24 @@ class Bartender(SlackBot.SlackBot):
 		isPrivate = channel.get('is_im', False)
 
 		text = eventJson['text']
-		strippedTokens = [t for t in re.split(r'\W', text.lower()) if t != '']
+
+		userDm = self.mentionString() + ': '
+		isDm = text.startswith(userDm)
+
+		strippedTokens = [t for t in re.split(r'\W', text) if t != '']
+		print('ST: %s' % strippedTokens)
+		#if isDm:
+		#	strippedTokens = strippedTokens[1:]
 
 		responses = None
 
 		#Bartender mostly respond to DM's and private chats
-		userDm = self.mentionString() + ': '
-		if isPrivate or text.startswith(userDm):
+		if isPrivate or isDm:
 			if len(strippedTokens) == 0:
 				responses = [
 					'Cat got your tongue?',
 					'What was that?',
+					'I can\'t hear you...',
 				]
 			elif strippedTokens[0] in ['hello', 'hi', 'hey', 'greetings']:
 				responses = [
@@ -76,7 +103,26 @@ class Bartender(SlackBot.SlackBot):
 					'Well, thank you.',
 				]
 			else:
-				commandName = strippedTokens[1] if len(strippedTokens) > 0 else None
+				commandName = strippedTokens[0].lower() if len(strippedTokens) > 0 else None
+				if commandName == 'quit':
+					user = self.getUser(userID)
+					if user['is_owner']:
+						goodbyes = [
+							'Goodbye.',
+							'Bye.',
+							'Later on.',
+						]
+						self.sendMessage(goodbyes, channel['id'])
+						sys.exit(0)
+					else:
+						goodbyes = [
+							'Haha',
+							'Good one.',
+							'You get out!',
+						]
+						self.sendMessage(goodbyes, channel['id'])
+						return
+
 				commands = {
 					'd3': rollCommand(3),
 					'd4': rollCommand(4),
@@ -101,7 +147,7 @@ class Bartender(SlackBot.SlackBot):
 						'My responses are limited. You must ask the right questions.',
 					]
 				else:
-					arguments = strippedTokens[2:]
+					arguments = strippedTokens[1:]
 					responses = command(arguments)
 
 		elif self.userID() in event.mentions:
