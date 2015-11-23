@@ -76,9 +76,8 @@ class Bartender(SlackBot.SlackBot):
 		isDm = text.startswith(userDm)
 
 		strippedTokens = [t for t in re.split(r'\W', text) if t != '']
-		print('ST: %s' % strippedTokens)
-		#if isDm:
-		#	strippedTokens = strippedTokens[1:]
+		if isDm:
+			strippedTokens = strippedTokens[1:]
 
 		responses = None
 
@@ -103,7 +102,7 @@ class Bartender(SlackBot.SlackBot):
 					'Well, thank you.',
 				]
 			else:
-				commandName = strippedTokens[0].lower() if len(strippedTokens) > 0 else None
+				commandName = strippedTokens[0].lower()
 				if commandName == 'quit':
 					user = self.getUser(userID)
 					if user['is_owner']:
@@ -136,7 +135,15 @@ class Bartender(SlackBot.SlackBot):
 
 					'air': airportCommand,
 					'airport': airportCommand,
+
+
+					#Dummy values for help display
+					'help': None,
+					'quit': None,
 				}
+				if commandName == 'help':
+					self.sendMessage('*Commands*\n%s' % ', '.join(sorted(commands.keys())), channel['id'])
+					return
 
 				command = commands.get(commandName)
 				if command is None:
