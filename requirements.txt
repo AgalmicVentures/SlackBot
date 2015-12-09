@@ -1,0 +1,4 @@
+requests==2.8.1
+six==1.10.0
+slacksocket==0.6.2
+websocket-client==0.34.0
