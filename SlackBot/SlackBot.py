@@ -61,6 +61,9 @@ class SlackBot:
 		"""
 		channels = [u for u in self._socket.loaded_channels['channels'] if u[self._idField] == channelID]
 		if len(channels) == 0:
+			channels = [u for u in self._socket.loaded_channels['groups'] if u[self._idField] == channelID]
+
+		if len(channels) == 0:
 			if self._translate:
 				user = self.getUser(channelID)
 				if user is not None:
