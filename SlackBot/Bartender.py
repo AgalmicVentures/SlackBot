@@ -99,6 +99,19 @@ class Bartender(SlackBot.SlackBot):
 					'Hello <@%s>.' % userID,
 					'Greetings, <@%s>.' % userID,
 				]
+			elif strippedTokens[0] == 'beer':
+				responses = [
+					':beer:',
+					':beers:',
+				]
+			elif strippedTokens[0] == 'cocktail':
+				responses = [
+					':cocktail:',
+				]
+			elif strippedTokens[0] == 'wine':
+				responses = [
+					':wine_glass:',
+				]
 			elif strippedTokens[:3] == ['how', 'are', 'you']:
 				responses = [
 					'Good.',
