@@ -68,7 +68,11 @@ class Bartender(SlackBot.SlackBot):
 
 		channelID = eventJson['channel']
 		channel = self.getChannel(channelID)
-		isPrivate = channel is not None and channel.get('is_im', False)
+		if channel is None:
+			isPrivate = False
+		else:
+			isPrivate = channel.get('is_im', False)
+			channelID = channel['id']
 
 		text = eventJson['text']
 
