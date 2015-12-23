@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import pprint
 import random
 import re
 import requests
@@ -88,7 +89,7 @@ class Bartender(SlackBot.SlackBot):
 
 	def handleMessage(self, event):
 		eventJson = event.event
-		print(eventJson)
+		pprint.pprint(eventJson)
 
 		#Ignore own messages
 		userID = eventJson.get('user')
@@ -135,6 +136,10 @@ class Bartender(SlackBot.SlackBot):
 					'Good.',
 					'Doing good.',
 					'Well, thank you.',
+				]
+			elif strippedTokens[:2] == ['knock', 'knock']:
+				responses = [
+					'Who\'s there?',
 				]
 			else:
 				commandName = strippedTokens[0].lower()
