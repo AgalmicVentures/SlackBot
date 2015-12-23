@@ -47,10 +47,39 @@ def airportCommand(args):
 
 	return '\n\n'.join(responses)
 
+def searchCommand(args):
+	if len(args) == 0:
+		return [
+			'What would you like to search for?',
+			'What can I help you find?',
+			'What are you looking for?',
+			'Can I help you?',
+		]
+	else:
+		search = ' '.join(args)
+		searchUrl = search.replace(' ', '%20') #TODO: do this properly
+		return '*Search results for "%s"*\nGoogle: http://www.google.com/search?q=%s\nLMGTFY: http://www.lmgtfy.com/?q=%s' % (
+			search, searchUrl, searchUrl,
+		)
+
 def rollCommand(n):
-	def roll(args):
+	def command(args):
 		return str(random.randint(1, n))
-	return roll
+	return command
+
+def targetedCommand(responses):
+	def command(args):
+		if len(args) == 0:
+			return responses
+		else:
+			user = args[0]
+			if user.startswith('<@') and user.endswidth('>'):
+				mention = user
+			else:
+				mention = '<@%s>' % user
+			return ['%s: %s' % (mention, response) for response in responses]
+
+	return command
 
 class Bartender(SlackBot.SlackBot):
 
@@ -74,7 +103,9 @@ class Bartender(SlackBot.SlackBot):
 			isPrivate = channel.get('is_im', False)
 			channelID = channel['id']
 
-		text = eventJson['text']
+		text = eventJson.get('text')
+		if text is None:
+			return #TODO: handle this better
 
 		userDm = self.mentionString() + ': '
 		isDm = text.startswith(userDm)
@@ -98,19 +129,6 @@ class Bartender(SlackBot.SlackBot):
 					'Hello.',
 					'Hello <@%s>.' % userID,
 					'Greetings, <@%s>.' % userID,
-				]
-			elif strippedTokens[0] == 'beer':
-				responses = [
-					':beer:',
-					':beers:',
-				]
-			elif strippedTokens[0] == 'cocktail':
-				responses = [
-					':cocktail:',
-				]
-			elif strippedTokens[0] == 'wine':
-				responses = [
-					':wine_glass:',
 				]
 			elif strippedTokens[:3] == ['how', 'are', 'you']:
 				responses = [
@@ -140,6 +158,16 @@ class Bartender(SlackBot.SlackBot):
 						return
 
 				commands = {
+					#Bar
+					'beer': targetedCommand([':beer:', ':beers:']),
+					'champagne': targetedCommand([':champgane:']),
+					'cocktail': targetedCommand([':cocktail:']),
+					'coffee': targetedCommand([':coffee:']),
+					'sake': targetedCommand([':sake:']),
+					'tea': targetedCommand([':tea:']),
+					'wine': targetedCommand([':wine_glass:']),
+
+					#One-off gambling
 					'd3': rollCommand(3),
 					'd4': rollCommand(4),
 					'd6': rollCommand(6),
@@ -147,12 +175,12 @@ class Bartender(SlackBot.SlackBot):
 					'd12': rollCommand(12),
 					'd20': rollCommand(20),
 					'roll': rollCommand(100),
-
 					'flip': lambda args: ['Heads.' if random.randint(0, 1) == 0 else 'Tails.'],
 
+					#Virtual assistant
 					'air': airportCommand,
 					'airport': airportCommand,
-
+					'search': searchCommand,
 
 					#Dummy values for help display
 					'help': None,
