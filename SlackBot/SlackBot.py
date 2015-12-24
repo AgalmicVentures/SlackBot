@@ -1,6 +1,7 @@
 
 import random
 import slacksocket
+import time
 
 class SlackBot:
 	"""
@@ -97,11 +98,23 @@ class SlackBot:
 
 		self._socket.send_msg(message, channel_id=channelID)
 
+	#TODO: add this API to slacksocket and do a pull request
+	def _getEventAsync(self):
+		try:
+			return self._socket._eventq.pop(0)
+		except IndexError:
+			return None
+
 	def handleEvents(self):
 		"""
 		Starts an infinite event handling loop.
 		"""
-		for event in self._socket.events():
+		while True:
+			event = self._getEventAsync()
+			if event is None:
+				time.sleep(0.25)
+				continue
+
 			self.handleEvent(event)
 
 	def handleEvent(self, event):
