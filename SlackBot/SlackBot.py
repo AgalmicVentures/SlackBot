@@ -1,4 +1,5 @@
 
+import datetime
 import random
 import slacksocket
 import time
@@ -14,6 +15,9 @@ class SlackBot:
 		self._idField = 'name' if translate else 'id'
 
 		self.reconnect()
+
+		#List of (time, message) pairs
+		self._queuedMessages = []
 
 	def token(self):
 		"""
@@ -84,7 +88,7 @@ class SlackBot:
 		users = [u for u in self._socket.loaded_users if u[self._idField] == userID]
 		return users[0] if len(users) > 0 else None
 
-	def sendMessage(self, message, channelID):
+	def sendMessage(self, message, channelID, delay=None):
 		"""
 		Sends a message to a channel as this bot.
 
@@ -92,6 +96,21 @@ class SlackBot:
 		:param channelID: str
 		:return: bool indicating success
 		"""
+		if delay is not None:
+			delayType = type(delay)
+			if delayType is datetime.timedelta:
+				t = datetime.datetime.now() + delay
+			elif delayType is int:
+				t = datetime.datetime.now() + datetime.timedelta(milliseconds=delay)
+			elif delayType is tuple:
+				minDelay, maxDelay = delay
+				t = datetime.datetime.now() + datetime.timedelta(milliseconds=random.randint(minDelay, maxDelay))
+			else:
+				raise ValueError('Invalid delay type: %s' % delayType)
+
+			self._queuedMessages.append( (t, message, channelID) )
+			return
+
 		#Take a random message from a list
 		if type(message) is list:
 			message = random.sample(message, 1)[0]
@@ -110,12 +129,27 @@ class SlackBot:
 		Starts an infinite event handling loop.
 		"""
 		while True:
-			event = self._getEventAsync()
-			if event is None:
-				time.sleep(0.25)
-				continue
+			#Process all events
+			while True:
+				event = self._getEventAsync()
+				if event is None:
+					break
 
-			self.handleEvent(event)
+				self.handleEvent(event)
+
+			#Send any queued messages
+			now = datetime.datetime.now()
+			newQueuedMessages = []
+			for queuedMessage in self._queuedMessages:
+				t, message, channelID = queuedMessage
+				if t <= now:
+					self.sendMessage(message, channelID)
+				else:
+					newQueuedMessages.append(queuedMessage)
+			self._queuedMessages = newQueuedMessages
+
+			#Sleep for a bit
+			time.sleep(0.1)
 
 	def handleEvent(self, event):
 		"""

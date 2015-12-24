@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import json
 import pprint
 import random
@@ -116,6 +117,7 @@ class Bartender(SlackBot.SlackBot):
 			strippedTokens = strippedTokens[1:]
 
 		responses = None
+		delay = (150, 450)
 
 		#Bartender mostly respond to DM's and private chats
 		if isPrivate or isDm:
@@ -203,7 +205,12 @@ class Bartender(SlackBot.SlackBot):
 						'I don\'t understand.',
 						'My responses are limited. You must ask the right questions.',
 					]
+					delay = (250, 750)
 				else:
+					#TODO: avoid special case
+					if command in ['air', 'airport']:
+						delay = None
+
 					arguments = strippedTokens[1:]
 					responses = command(arguments)
 
@@ -213,7 +220,7 @@ class Bartender(SlackBot.SlackBot):
 			]
 
 		if responses is not None:
-			self.sendMessage(responses, channelID)
+			self.sendMessage(responses, channelID, delay=delay)
 
 def main():
 	#TODO: parse arguments
