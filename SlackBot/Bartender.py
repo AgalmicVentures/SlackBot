@@ -6,6 +6,7 @@ import pprint
 import random
 import re
 import requests
+import socket
 import sys
 
 from SlackBot import SlackBot
@@ -48,6 +49,27 @@ def airportCommand(args):
 		#TODO: handle other exceptions?
 
 	return '\n\n'.join(responses)
+
+def dnsCommand(args):
+	if len(args) == 0:
+		return [
+			'What domains would you like to look up?',
+			'Please enter a list of domains to look up.',
+		]
+	else:
+		responses = []
+		for arg in args:
+			parsedUrl = arg[arg.find('|') + 1:-1]
+			try:
+				response = socket.gethostbyname(parsedUrl)
+			except Exception as e:
+				response = str(e)
+
+			if len(args) == 1:
+				responses.append(response)
+			else:
+				responses.append('%s: %s' % (parsedUrl, response))
+		return '\n\n'.join(responses)
 
 def searchCommand(args):
 	if len(args) == 0:
@@ -112,7 +134,7 @@ class Bartender(SlackBot.SlackBot):
 		userDm = self.mentionString() + ': '
 		isDm = text.startswith(userDm)
 
-		strippedTokens = [t for t in re.split(r'\W', text) if t != '']
+		strippedTokens = [t for t in re.split(r' ', text) if t != '']
 		if isDm:
 			strippedTokens = strippedTokens[1:]
 
@@ -185,9 +207,11 @@ class Bartender(SlackBot.SlackBot):
 					'flip': lambda args: ['Heads.' if random.randint(0, 1) == 0 else 'Tails.'],
 
 					#Virtual assistant
-					'air': airportCommand,
 					'airport': airportCommand,
 					'search': searchCommand,
+
+					#IT
+					'dns': dnsCommand,
 
 					#Dummy values for help display
 					'help': None,
