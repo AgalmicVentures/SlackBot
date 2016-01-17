@@ -232,7 +232,7 @@ class Bartender(SlackBot.SlackBot):
 					delay = (250, 750)
 				else:
 					#TODO: avoid special case
-					if command in ['air', 'airport']:
+					if command in ['airport']:
 						delay = None
 
 					arguments = strippedTokens[1:]
