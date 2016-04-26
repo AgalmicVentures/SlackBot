@@ -138,6 +138,8 @@ class Bartender(SlackBot.SlackBot):
 		if isDm:
 			strippedTokens = strippedTokens[1:]
 
+		lowerStrippedTokens = [t.lower() for t in strippedTokens]
+
 		responses = None
 		delay = (150, 450)
 
@@ -149,24 +151,24 @@ class Bartender(SlackBot.SlackBot):
 					'What was that?',
 					'I can\'t hear you...',
 				]
-			elif strippedTokens[0] in ['hello', 'hi', 'hey', 'greetings']:
+			elif lowerStrippedTokens[0] in ['hello', 'hi', 'hey', 'greetings']:
 				responses = [
 					'Hello.',
 					'Hello <@%s>.' % userID,
 					'Greetings, <@%s>.' % userID,
 				]
-			elif strippedTokens[:3] == ['how', 'are', 'you']:
+			elif lowerStrippedTokens[:3] == ['how', 'are', 'you']:
 				responses = [
 					'Good.',
 					'Doing good.',
 					'Well, thank you.',
 				]
-			elif strippedTokens[:2] == ['knock', 'knock']:
+			elif lowerStrippedTokens[:2] == ['knock', 'knock']:
 				responses = [
 					'Who\'s there?',
 				]
 			else:
-				commandName = strippedTokens[0].lower()
+				commandName = lowerStrippedTokens[0]
 				if commandName == 'quit':
 					user = self.getUser(userID)
 					if user['is_owner']:
