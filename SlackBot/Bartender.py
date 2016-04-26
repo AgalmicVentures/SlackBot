@@ -145,17 +145,31 @@ class Bartender(SlackBot.SlackBot):
 
 		#Bartender mostly respond to DM's and private chats
 		if isPrivate or isDm:
+			#TODO: separate conversation engine from command engine
 			if len(strippedTokens) == 0:
 				responses = [
 					'Cat got your tongue?',
 					'What was that?',
 					'I can\'t hear you...',
 				]
-			elif lowerStrippedTokens[0] in ['hello', 'hi', 'hey', 'greetings']:
+			elif lowerStrippedTokens[0] in ['hello', 'hi', 'hey', 'greetings', 'howdy']:
 				responses = [
 					'Hello.',
 					'Hello <@%s>.' % userID,
 					'Greetings, <@%s>.' % userID,
+				]
+			elif lowerStrippedTokens[0] in ['goodbye', 'bye']:
+				responses = [
+					'Goodbye.',
+					'Bye.',
+					'Goodbye <@%s>.' % userID,
+					'See you later.',
+				]
+			elif lowerStrippedTokens[0] == 'thanks' or lowerStrippedTokens[0:1] == ['thank', 'you']:
+				responses = [
+					'You\'re welcome.',
+					'You\'re welcome <@%s>.' % userID,
+					'No problem.',
 				]
 			elif lowerStrippedTokens[:3] == ['how', 'are', 'you']:
 				responses = [
@@ -188,6 +202,7 @@ class Bartender(SlackBot.SlackBot):
 						self.sendMessage(goodbyes, channelID)
 						return
 
+				#TODO: move this out to the top level
 				commands = {
 					#Bar
 					'beer': targetedCommand([':beer:', ':beers:']),
