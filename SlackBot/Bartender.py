@@ -9,7 +9,7 @@ import requests
 import socket
 import sys
 
-from SlackBot import SlackBot
+import SlackBot
 
 #TODO: stop duplicating this
 def getAirportData(airport):
