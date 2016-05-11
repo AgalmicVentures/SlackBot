@@ -155,7 +155,11 @@ class SlackBot:
 		"""
 		Handle a single event from the event stream.
 		"""
-		eventType = event.type
+		try:
+			eventType = event.type
+		except AttributeError:
+			print('Event type is missing for event: %s' % event)
+
 		if eventType == 'hello':
 			self.handleHello(event)
 		elif eventType == 'message':
