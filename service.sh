@@ -5,6 +5,7 @@ set -u
 ##### Settings #####
 
 COMMAND=SlackBot/Bartender.py
+TOKEN=TODO_PUT_YOUR_TOKEN_HERE
 
 ##### Helpers #####
 
@@ -23,7 +24,7 @@ function start {
 	fi
 
 	echo "Starting..."
-	nohup $PROCESS &
+	nohup $PROCESS -t $TOKEN &
 	sleep 1
 
 	PROCESSES=$(get_processes)
