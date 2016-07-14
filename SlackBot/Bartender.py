@@ -31,9 +31,11 @@ def airportCommand(args):
 			break #If the API is broken, no need to club it to death
 
 		try:
-			delay = 'Delay (average): %s - %s' % (
-				airportData['status']['avgDelay'],
+			delay = 'Delay reason: %s - Min: %s - Max: %s - Average: %s' % (
 				airportData['status']['reason'],
+				airportData['status']['minDelay'],
+				airportData['status']['maxDelay'],
+				airportData['status']['avgDelay'],
 			) if airportData['delay'] == 'true' else 'No delay. :thumbsup:'
 
 			header = '*%s*\n' % airport if len(args) > 1 else ''
@@ -164,9 +166,11 @@ class Bartender(SlackBot.SlackBot):
 					'Hello.',
 					'Hello <@%s>.' % userID,
 					'Greetings, <@%s>.' % userID,
+					'Hi there.',
 				]
 			elif lowerStrippedTokens[0] in ['goodbye', 'bye']:
 				responses = [
+					'Later on!',
 					'Goodbye.',
 					'Bye.',
 					'Goodbye <@%s>.' % userID,
@@ -180,14 +184,16 @@ class Bartender(SlackBot.SlackBot):
 				]
 			elif lowerStrippedTokens[:3] == ['how', 'are', 'you']:
 				responses = [
-					'Good.',
+					'Good. You?',
 					'Doing good.',
 					'Well, thank you.',
+					'Very well. You?'
 				]
 			elif lowerStrippedTokens[:2] == ['knock', 'knock']:
 				responses = [
 					'Who\'s there?',
 				]
+				#TODO: handle the rest of a knock-knock joke by keeping per-user state
 			else:
 				commandName = lowerStrippedTokens[0]
 				if commandName == 'quit':
@@ -225,13 +231,14 @@ class Bartender(SlackBot.SlackBot):
 					'flip': lambda args: ['Heads.' if random.randint(0, 1) == 0 else 'Tails.'],
 
 					#Virtual assistant
+					'air': airportCommand,
 					'airport': airportCommand,
 					'search': searchCommand,
 
 					#IT
 					'dns': dnsCommand,
 
-					#Dummy values for help display
+					#Dummy values for help diwsplay
 					'help': None,
 					'quit': None,
 				}
@@ -245,12 +252,13 @@ class Bartender(SlackBot.SlackBot):
 						'What?',
 						'Huh?',
 						'I don\'t understand.',
+						'Sorry, I don\'t understand.'
 						'My responses are limited. You must ask the right questions.',
 					]
 					delay = (250, 750)
 				else:
 					#TODO: avoid special case
-					if command in ['airport']:
+					if command in ['air', 'airport', 'dns']:
 						delay = None
 
 					arguments = strippedTokens[1:]
@@ -259,6 +267,7 @@ class Bartender(SlackBot.SlackBot):
 		elif self.userID() in event.mentions:
 			responses = [
 				'My ears are burning...',
+				'Hmmm?',
 			]
 
 		if responses is not None:
