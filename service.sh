@@ -24,7 +24,7 @@ function start {
 	fi
 
 	echo "Starting..."
-	nohup $PROCESS -t $TOKEN &
+	nohup $PROCESS $TOKEN &
 	sleep 1
 
 	PROCESSES=$(get_processes)
