@@ -4,7 +4,7 @@ import random
 import slacksocket
 import time
 
-class SlackBot:
+class SlackBot(object):
 	"""
 	Base class which implements a lots of useful helpers.
 	"""

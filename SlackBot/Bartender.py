@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import datetime
 import json
 import pprint
 import random
@@ -17,6 +16,7 @@ def getAirportData(airport):
 		request = requests.get('http://services.faa.gov/airport/status/%s?format=json' % airport)
 		return request.json()
 	except Exception as e:
+		print('Error grabbing airport data: %s' % e)
 		return None
 
 def airportCommand(args):
@@ -86,10 +86,16 @@ def searchCommand(args):
 			search, searchUrl, searchUrl,
 		)
 
-def rollCommand(n):
-	def command(args):
-		return str(random.randint(1, n))
-	return command
+def rollCommand(args):
+	if len(args) == 0:
+		n = 100
+	else:
+		try:
+			n = int(ags[0])
+		except ValueError:
+			return 'You must enter a valid number for the maximum value.'
+
+	return str(random.randint(1, n))
 
 def targetedCommand(responses):
 	def command(args):
@@ -214,13 +220,7 @@ class Bartender(SlackBot.SlackBot):
 					'wine': targetedCommand([':wine_glass:']),
 
 					#One-off gambling
-					'd3': rollCommand(3),
-					'd4': rollCommand(4),
-					'd6': rollCommand(6),
-					'd10': rollCommand(10),
-					'd12': rollCommand(12),
-					'd20': rollCommand(20),
-					'roll': rollCommand(100),
+					'roll': rollCommand,
 					'flip': lambda args: ['Heads.' if random.randint(0, 1) == 0 else 'Tails.'],
 
 					#Virtual assistant
