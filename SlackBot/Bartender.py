@@ -91,11 +91,12 @@ def rollCommand(args):
 		n = 100
 	else:
 		try:
-			n = int(ags[0])
+			n = int(args[0])
 		except ValueError:
 			return 'You must enter a valid number for the maximum value.'
 
-	return str(random.randint(1, n))
+	value = random.randint(1, n)
+	return 'Rolling 1 - %d: %d' % (n, value)
 
 def targetedCommand(responses):
 	def command(args):
