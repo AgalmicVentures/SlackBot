@@ -274,9 +274,14 @@ class Bartender(SlackBot.SlackBot):
 			self.sendMessage(responses, channelID, delay=delay)
 
 def main():
-	#TODO: parse arguments
+	#Parse arguments
+	parser = argparse.ArgumentParser(description='Bartender (Slack Bot)')
 
-	b = Bartender('xoxb-11017522369-7VdJedQjJ5yAnnWs6jOOhXZk')
+	parser.add_argument('token', action='store', help='Slack API token.')
+
+	arguments = parser.parse_args(sys.argv[1:])
+
+	b = Bartender(arguments.token)
 	b.handleEvents()
 
 	return 0
