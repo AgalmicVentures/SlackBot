@@ -26,7 +26,7 @@ import time
 
 class SlackBot(object):
 	"""
-	Base class which implements a lots of useful helpers.
+	Base bot class with helpers to simplify business logic in an actual bot.
 	"""
 
 	def __init__(self, token, translate=True):
@@ -139,6 +139,11 @@ class SlackBot(object):
 
 	#TODO: add this API to slacksocket and do a pull request
 	def _getEventAsync(self):
+		"""
+		Returns the next event, or returns None immediately (no blocking).
+
+		:return: dict or None
+		"""
 		try:
 			return self._socket._eventq.pop(0)
 		except IndexError:

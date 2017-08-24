@@ -31,8 +31,12 @@ import sys
 
 import SlackBot
 
-#TODO: stop duplicating this
 def getAirportData(airport):
+	"""
+	Queries the FAA's JSON API for real time airport data.
+
+	:return: dict or None
+	"""
 	try:
 		request = requests.get('http://services.faa.gov/airport/status/%s?format=json' % airport)
 		return request.json()
@@ -41,6 +45,12 @@ def getAirportData(airport):
 		return None
 
 def airportCommand(args):
+	"""
+	Command to check the status of 1 or more airports.
+
+	:param args: list of str
+	:return: list of str
+	"""
 	if len(args) == 0:
 		return 'Usage: `air <CODE> [<CODE2> ...]` e.g. `air LGA`.'
 
@@ -74,6 +84,12 @@ def airportCommand(args):
 	return '\n\n'.join(responses)
 
 def dnsCommand(args):
+	"""
+	Command to DNS lookup 1 or more domains.
+
+	:param args: list of str
+	:return: list of str
+	"""
 	if len(args) == 0:
 		return [
 			'What domains would you like to look up?',
@@ -95,6 +111,12 @@ def dnsCommand(args):
 		return '\n\n'.join(responses)
 
 def searchCommand(args):
+	"""
+	Command to generate search links from within Slack.
+
+	:param args: list of str
+	:return: list of str
+	"""
 	if len(args) == 0:
 		return [
 			'What would you like to search for?',
@@ -110,6 +132,12 @@ def searchCommand(args):
 		)
 
 def rollCommand(args):
+	"""
+	Command to roll an n-sided die (default 100).
+
+	:param args: list of str
+	:return: list of str
+	"""
 	if len(args) == 0:
 		n = 100
 	else:
@@ -122,6 +150,13 @@ def rollCommand(args):
 	return 'Rolling 1 - %d: %d' % (n, value)
 
 def targetedCommand(responses):
+	"""
+	Generates a command that returns a list of responses, targeting a user if
+	appropriate.
+
+	:param args: list of str
+	:return: command function
+	"""
 	def command(args):
 		if len(args) == 0:
 			return responses
@@ -136,6 +171,12 @@ def targetedCommand(responses):
 	return command
 
 class Bartender(SlackBot.SlackBot):
+	"""
+	A simple bot that "tends bar".
+
+	Besides making small talk and serving drinks, the bartender can also do
+	searches and DNS lookups, and check the status of airports.
+	"""
 
 	def __init__(self, token):
 		SlackBot.SlackBot.__init__(self, token)
