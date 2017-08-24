@@ -161,7 +161,7 @@ class Bartender(SlackBot.SlackBot):
 		if text is None:
 			return #TODO: handle this better
 
-		userDm = self.mentionString() + ': '
+		userDm = self.mentionString() #The following : is optional here
 		isDm = text.startswith(userDm)
 
 		strippedTokens = [t for t in re.split(r' ', text) if t != '']
