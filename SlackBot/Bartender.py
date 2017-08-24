@@ -181,6 +181,10 @@ class Bartender(SlackBot.SlackBot):
 					'Cat got your tongue?',
 					'What was that?',
 					'I can\'t hear you...',
+					'Hmmm?',
+					'What?',
+					'Yes?',
+					'Can I help you?',
 				]
 			elif lowerStrippedTokens[0] in ['hello', 'hi', 'hey', 'greetings', 'howdy']:
 				responses = [
@@ -197,7 +201,7 @@ class Bartender(SlackBot.SlackBot):
 					'Goodbye <@%s>.' % userID,
 					'See you later.',
 				]
-			elif lowerStrippedTokens[0] == 'thanks' or lowerStrippedTokens[0:1] == ['thank', 'you']:
+			elif lowerStrippedTokens[0] in ['thanks', 'thankyou'] or lowerStrippedTokens[0:1] == ['thank', 'you']:
 				responses = [
 					'You\'re welcome.',
 					'You\'re welcome <@%s>.' % userID,
@@ -208,11 +212,16 @@ class Bartender(SlackBot.SlackBot):
 					'Good. You?',
 					'Doing good.',
 					'Well, thank you.',
-					'Very well. You?'
+					'Very well. You?',
+				]
+			elif lowerStrippedTokens[:3] == ['what', 'are', 'you']:
+				responses = [
+					'I am a bot. DM me help to get help.',
 				]
 			elif lowerStrippedTokens[:2] == ['knock', 'knock']:
 				responses = [
 					'Who\'s there?',
+					'Really, a knock knock joke?',
 				]
 				#TODO: handle the rest of a knock-knock joke by keeping per-user state
 			else:
@@ -288,6 +297,7 @@ class Bartender(SlackBot.SlackBot):
 		elif self.userID() in event.mentions:
 			responses = [
 				'My ears are burning...',
+				'My ears burn...',
 				'Hmmm?',
 			]
 
