@@ -20,6 +20,7 @@
 # SOFTWARE.
 
 import datetime
+import queue
 import random
 import slacksocket
 import time
@@ -137,18 +138,6 @@ class SlackBot(object):
 
 		self._socket.send_msg(message, channel_id=channelID)
 
-	#TODO: add this API to slacksocket and do a pull request
-	def _getEventAsync(self):
-		"""
-		Returns the next event, or returns None immediately (no blocking).
-
-		:return: dict or None
-		"""
-		try:
-			return self._socket._eventq.pop(0)
-		except IndexError:
-			return None
-
 	def handleEvents(self):
 		"""
 		Starts an infinite event handling loop.
@@ -156,9 +145,10 @@ class SlackBot(object):
 		while True:
 			#Process all events
 			while True:
-				event = self._getEventAsync()
-				if event is None:
-					break
+				try:
+					event = self._socket.get_event(timeout=0)
+				except queue.Empty:
+						break
 
 				self.handleEvent(event)
 
