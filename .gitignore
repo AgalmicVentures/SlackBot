@@ -60,4 +60,5 @@ target/
 nohup.out
 .DS_store
 myenv/
+*.token
 

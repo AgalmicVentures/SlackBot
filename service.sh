@@ -26,7 +26,7 @@
 ##### Settings #####
 
 COMMAND=SlackBot/Bartender.py
-TOKEN=TODO_PUT_YOUR_TOKEN_HERE
+TOKEN=$(cat bartender.token)
 
 ##### Helpers #####
 
