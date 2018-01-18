@@ -1,0 +1,5 @@
+
+  - name: restart Bartender
+    systemd:
+      name: bartender
+      state: restarted
