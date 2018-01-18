@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -u
+#XXX: Disabled so the virtual environment will work (yes, this is ridiculous)
+#set -u
 source service.sh
 
 stop

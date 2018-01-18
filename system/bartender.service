@@ -1,4 +1,3 @@
-#!/bin/bash
 
 # Copyright (c) 2015-2018 Agalmic Ventures LLC (www.agalmicventures.com)
 #
@@ -20,10 +19,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -e
-#XXX: Disabled so the virtual environment will work (yes, this is ridiculous)
-#set -u
+[Unit]
+Description=Bartender Service
+After=network.target
 
-./stop.sh
-sleep 1
-./start.sh
+[Service]
+Type=forking
+User=root
+Group=root
+#EnvironmentFile=/etc/bartender/bartender.conf
+WorkingDirectory=/home/bartender/Code/OpenSource/SlackBot
+ExecStart=/bin/sh -c '/home/bartender/Code/OpenSource/SlackBot/start.sh'
+ExecStop=/bin/sh -c '/home/bartender/Code/OpenSource/SlackBot/stop.sh'
+ExecReload=/bin/sh -c '/home/bartender/Code/OpenSource/SlackBot/restart.sh'
+
+[Install]
+WantedBy=multi-user.target

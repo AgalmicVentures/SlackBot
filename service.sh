@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -u
+#XXX: Disabled so the virtual environment will work (yes, this is ridiculous)
+#set -u
 
 ##### Settings #####
 
@@ -41,6 +42,11 @@ function start {
 	if [[ $? -eq 0 ]]; then
 		echo "Already running"
 		return 0
+	fi
+
+	#Automatically source a virtual environment if available
+	if [ -e myenv ]; then
+		source myenv/bin/activate
 	fi
 
 	echo "Starting..."
