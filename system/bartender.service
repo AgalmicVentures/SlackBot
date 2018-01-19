@@ -25,8 +25,8 @@ After=network.target
 
 [Service]
 Type=forking
-User=root
-Group=root
+User=bartender
+Group=bartender
 #EnvironmentFile=/etc/bartender/bartender.conf
 WorkingDirectory=/home/bartender/Code/OpenSource/SlackBot
 ExecStart=/bin/sh -c '/home/bartender/Code/OpenSource/SlackBot/start.sh'
