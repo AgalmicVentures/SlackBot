@@ -22,7 +22,6 @@
 
 import argparse
 import json
-import pprint
 import random
 import re
 import requests
@@ -183,7 +182,6 @@ class Bartender(SlackBot.SlackBot):
 
 	def handleMessage(self, event):
 		eventJson = event.event
-		pprint.pprint(eventJson)
 
 		#Ignore own messages
 		userID = eventJson.get('user')
