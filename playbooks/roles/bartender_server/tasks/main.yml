@@ -36,7 +36,7 @@
   become: yes
   become_user: bartender
   notify:
-    - restart Bartender
+    - restart bartender
   tags:
     - bartender
 
@@ -48,7 +48,7 @@
   become: yes
   become_user: bartender
   notify:
-    - restart Bartender
+    - restart bartender
   tags:
     - bartender
 
@@ -76,6 +76,8 @@
   become: yes
   become_user: bartender
   when: not stat_result.stat.exists
+  notify:
+    - restart bartender
   tags:
     - bartender
 
@@ -85,6 +87,8 @@
     dest: /lib/systemd/system/bartender.service
     state: link
     force: yes
+  notify:
+    - restart bartender
   tags:
     - bartender
 
