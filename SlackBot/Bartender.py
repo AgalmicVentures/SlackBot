@@ -184,17 +184,20 @@ class Bartender(SlackBot.SlackBot):
 		eventJson = event.event
 
 		#Ignore own messages
-		userID = eventJson.get('user')
-		if userID == self.userID():
+		userId = eventJson.get('user')
+		if userId == self.userId():
 			return
 
-		channelID = eventJson['channel']
-		channel = self.getChannel(channelID)
+		user = self.getUser(userId)
+		translatedId = user['id'] if user is not None else None
+
+		channelId = eventJson['channel']
+		channel = self.getChannel(channelId)
 		if channel is None:
 			isPrivate = False
 		else:
 			isPrivate = channel.get('is_im', False)
-			channelID = channel['id']
+			channelId = channel['id']
 
 		text = eventJson.get('text')
 		if text is None:
@@ -228,8 +231,8 @@ class Bartender(SlackBot.SlackBot):
 			elif lowerStrippedTokens[0] in ['hello', 'hi', 'hey', 'greetings', 'howdy']:
 				responses = [
 					'Hello.',
-					'Hello <@%s>.' % userID,
-					'Greetings, <@%s>.' % userID,
+					'Hello <@%s>.' % translatedId,
+					'Greetings, <@%s>.' % translatedId,
 					'Hi there.',
 				]
 			elif lowerStrippedTokens[0] in ['goodbye', 'bye']:
@@ -237,13 +240,13 @@ class Bartender(SlackBot.SlackBot):
 					'Later on!',
 					'Goodbye.',
 					'Bye.',
-					'Goodbye <@%s>.' % userID,
+					'Goodbye <@%s>.' % translatedId,
 					'See you later.',
 				]
 			elif lowerStrippedTokens[0] in ['thanks', 'thankyou'] or lowerStrippedTokens[0:1] == ['thank', 'you']:
 				responses = [
 					'You\'re welcome.',
-					'You\'re welcome <@%s>.' % userID,
+					'You\'re welcome <@%s>.' % translatedId,
 					'No problem.',
 				]
 			elif lowerStrippedTokens[:3] == ['how', 'are', 'you']:
@@ -266,14 +269,14 @@ class Bartender(SlackBot.SlackBot):
 			else:
 				commandName = lowerStrippedTokens[0]
 				if commandName == 'quit':
-					user = self.getUser(userID)
+					user = self.getUser(userId)
 					if user['is_owner']:
 						goodbyes = [
 							'Goodbye.',
 							'Bye.',
 							'Later on.',
 						]
-						self.sendMessage(goodbyes, channelID)
+						self.sendMessage(goodbyes, channelId)
 						sys.exit(0)
 					else:
 						goodbyes = [
@@ -281,7 +284,7 @@ class Bartender(SlackBot.SlackBot):
 							'Good one.',
 							'You get out!',
 						]
-						self.sendMessage(goodbyes, channelID)
+						self.sendMessage(goodbyes, channelId)
 						return
 
 				#TODO: move this out to the top level
@@ -312,7 +315,7 @@ class Bartender(SlackBot.SlackBot):
 					'quit': None,
 				}
 				if commandName == 'help':
-					self.sendMessage('*Commands*\n%s' % ', '.join(sorted(commands.keys())), channelID)
+					self.sendMessage('*Commands*\n%s' % ', '.join(sorted(commands.keys())), channelId)
 					return
 
 				command = commands.get(commandName)
@@ -333,7 +336,7 @@ class Bartender(SlackBot.SlackBot):
 					arguments = strippedTokens[1:]
 					responses = command(arguments)
 
-		elif self.userID() in event.mentions:
+		elif self.userId() in event.mentions:
 			responses = [
 				'My ears are burning...',
 				'My ears burn...',
@@ -341,7 +344,7 @@ class Bartender(SlackBot.SlackBot):
 			]
 
 		if responses is not None:
-			self.sendMessage(responses, channelID, delay=delay)
+			self.sendMessage(responses, channelId, delay=delay)
 
 def main():
 	#Parse arguments

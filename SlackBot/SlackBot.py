@@ -48,7 +48,7 @@ class SlackBot(object):
 		"""
 		return self._token
 
-	def userID(self):
+	def userId(self):
 		"""
 		Returns the bot's user ID.
 
@@ -62,7 +62,7 @@ class SlackBot(object):
 
 		:return: dict
 		"""
-		return self.getUser(self.userID())
+		return self.getUser(self.userId())
 
 	def mentionString(self):
 		"""
@@ -78,43 +78,43 @@ class SlackBot(object):
 		"""
 		self._socket = slacksocket.SlackSocket(self._token, translate=self._translate)
 
-	def getChannel(self, channelID):
+	def getChannel(self, channelId):
 		"""
 		Gets a channel from an ID.
 
-		:param channelID: str
+		:param channelId: str
 		:return dict (channel JSON)
 		"""
-		channels = [u for u in self._socket.loaded_channels['channels'] if u[self._idField] == channelID]
+		channels = [u for u in self._socket.loaded_channels['channels'] if u[self._idField] == channelId]
 		if len(channels) == 0:
-			channels = [u for u in self._socket.loaded_channels['groups'] if u[self._idField] == channelID]
+			channels = [u for u in self._socket.loaded_channels['groups'] if u[self._idField] == channelId]
 
 		if len(channels) == 0:
 			if self._translate:
-				user = self.getUser(channelID)
+				user = self.getUser(channelId)
 				if user is not None:
 					channels = [u for u in self._socket.loaded_channels['ims'] if u['user'] == user['id']]
 			else:
-				channels = [u for u in self._socket.loaded_channels['ims'] if u[self._idField] == channelID]
+				channels = [u for u in self._socket.loaded_channels['ims'] if u[self._idField] == channelId]
 
 		return channels[0] if len(channels) > 0 else None
 
-	def getUser(self, userID):
+	def getUser(self, userId):
 		"""
 		Gets a user from an ID.
 
-		:param userID: str
+		:param userId: str
 		:return dict (user JSON)
 		"""
-		users = [u for u in self._socket.loaded_users if u[self._idField] == userID]
+		users = [u for u in self._socket.loaded_users if u[self._idField] == userId]
 		return users[0] if len(users) > 0 else None
 
-	def sendMessage(self, message, channelID, delay=None):
+	def sendMessage(self, message, channelId, delay=None):
 		"""
 		Sends a message to a channel as this bot.
 
 		:param message: str or [str]
-		:param channelID: str
+		:param channelId: str
 		:return: bool indicating success
 		"""
 		if delay is not None:
@@ -129,14 +129,14 @@ class SlackBot(object):
 			else:
 				raise ValueError('Invalid delay type: %s' % delayType)
 
-			self._queuedMessages.append( (t, message, channelID) )
+			self._queuedMessages.append( (t, message, channelId) )
 			return
 
 		#Take a random message from a list
 		if type(message) is list:
 			message = random.sample(message, 1)[0]
 
-		self._socket.send_msg(message, channel_id=channelID)
+		self._socket.send_msg(message, channel_id=channelId)
 
 	def handleEvents(self):
 		"""
@@ -156,9 +156,9 @@ class SlackBot(object):
 			now = datetime.datetime.now()
 			newQueuedMessages = []
 			for queuedMessage in self._queuedMessages:
-				t, message, channelID = queuedMessage
+				t, message, channelId = queuedMessage
 				if t <= now:
-					self.sendMessage(message, channelID)
+					self.sendMessage(message, channelId)
 				else:
 					newQueuedMessages.append(queuedMessage)
 			self._queuedMessages = newQueuedMessages
