@@ -321,7 +321,7 @@ class Bartender(SlackBot.SlackBot):
 						'What?',
 						'Huh?',
 						'I don\'t understand.',
-						'Sorry, I don\'t understand.'
+						'Sorry, I don\'t understand.',
 						'My responses are limited. You must ask the right questions.',
 					]
 					delay = (250, 750)
