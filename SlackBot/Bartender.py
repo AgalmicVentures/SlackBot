@@ -177,8 +177,8 @@ class Bartender(SlackBot.SlackBot):
 	searches and DNS lookups, and check the status of airports.
 	"""
 
-	def __init__(self, token):
-		SlackBot.SlackBot.__init__(self, token)
+	def __init__(self, token, errorChannel, alertMention):
+		SlackBot.SlackBot.__init__(self, token, errorChannel, alertMention)
 
 	def handleMessage(self, event):
 		eventJson = event.event
@@ -271,20 +271,31 @@ class Bartender(SlackBot.SlackBot):
 				if commandName == 'quit':
 					user = self.getUser(userId)
 					if user['is_owner']:
-						goodbyes = [
+						responses = [
 							'Goodbye.',
 							'Bye.',
 							'Later on.',
 						]
-						self.sendMessage(goodbyes, channelId)
+						self.sendMessage(responses, channelId)
 						sys.exit(0)
 					else:
-						goodbyes = [
+						responses = [
 							'Haha',
 							'Good one.',
 							'You get out!',
 						]
-						self.sendMessage(goodbyes, channelId)
+						self.sendMessage(responses, channelId)
+						return
+				elif commandName == 'error':
+					user = self.getUser(userId)
+					if user['is_owner']:
+						int('asdf')
+					else:
+						responses = [
+							'Nope.',
+							'I am perfect and have no errors.',
+						]
+						self.sendMessage(responses, channelId)
 						return
 
 				#TODO: move this out to the top level
@@ -350,11 +361,16 @@ def main():
 	#Parse arguments
 	parser = argparse.ArgumentParser(description='Bartender (Slack Bot)')
 
+	parser.add_argument('-e', '--error-channel', action='store', default='operations',
+		help='Channel to send errors to (default: operations).')
+	parser.add_argument('-m', '--alert-mention', action='store',
+		help='User to alert by mentioning (default: None).')
 	parser.add_argument('token', action='store', help='Slack API token.')
 
 	arguments = parser.parse_args(sys.argv[1:])
 
-	b = Bartender(arguments.token)
+	#Start the bartender
+	b = Bartender(arguments.token, arguments.error_channel, arguments.alert_mention)
 	b.handleEvents()
 
 	return 0

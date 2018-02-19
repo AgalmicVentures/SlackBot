@@ -24,18 +24,23 @@ import queue
 import random
 import slacksocket
 import time
+import traceback
 
 class SlackBot(object):
 	"""
 	Base bot class with helpers to simplify business logic in an actual bot.
 	"""
 
-	def __init__(self, token, translate=True):
+	def __init__(self, token, errorChannel, alertMention=None, translate=True):
 		self._token = token
 		self._translate = translate
 		self._idField = 'name' if translate else 'id'
 
 		self.reconnect()
+		self._errorChannel = self.getChannelByName(errorChannel)
+		alertMentionUser = None if alertMention is None else self.getUser(alertMention)
+		self._alertMention = '' if alertMentionUser is None else '<@%s>: ' % alertMentionUser['id']
+		self._errorChannel = self.getChannelByName(errorChannel)
 
 		#List of (time, message) pairs
 		self._queuedMessages = []
@@ -99,6 +104,18 @@ class SlackBot(object):
 
 		return channels[0] if len(channels) > 0 else None
 
+	def getChannelByName(self, channelName):
+		"""
+		Gets a channel from a name.
+
+		:param channelName: str
+		:return dict (channel JSON)
+		"""
+		channels = [u for u in self._socket.loaded_channels['channels'] if u['name'] == channelName]
+		if len(channels) == 0:
+			channels = [u for u in self._socket.loaded_channels['groups'] if u['name'] == channelName]
+		return channels[0] if len(channels) > 0 else None
+
 	def getUser(self, userId):
 		"""
 		Gets a user from an ID.
@@ -138,6 +155,19 @@ class SlackBot(object):
 
 		self._socket.send_msg(message, channel_id=channelId)
 
+	def sendErrorMessage(self, message, exception=None):
+		if exception is None:
+			print(message)
+			if self._errorChannel is not None:
+				self.sendMessage('%s%s' % (self._alertMention, message), self._errorChannel['id'])
+		else:
+			print('%s: %s' % (message, exception))
+			backTrace = traceback.format_exc()
+			print(backTrace)
+			if self._errorChannel is not None:
+				self.sendMessage('%s%s - %s ```%s```' % (
+					self._alertMention, message, exception, backTrace), self._errorChannel['id'])
+
 	def handleEvents(self):
 		"""
 		Starts an infinite event handling loop.
@@ -150,13 +180,18 @@ class SlackBot(object):
 				except queue.Empty:
 						break
 
-				self.handleEvent(event)
+				try:
+					self.handleEvent(event)
+				except Exception as exception:
+					if self._errorChannel is not None:
+						self.sendErrorMessage('Error handling event', exception)
 
 			#Send any queued messages
 			now = datetime.datetime.now()
 			newQueuedMessages = []
 			for queuedMessage in self._queuedMessages:
 				t, message, channelId = queuedMessage
+				import pprint ; pprint.pprint(self._socket.loaded_channels['groups'])
 				if t <= now:
 					self.sendMessage(message, channelId)
 				else:
