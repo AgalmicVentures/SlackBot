@@ -52,27 +52,27 @@
   tags:
     - bartender
 
-- name: Checking for Slack token
+- name: Checking for arguments (including Slack token)
   stat:
-    path: /home/bartender/Code/OpenSource/SlackBot/bartender.token
+    path: /home/bartender/Code/OpenSource/SlackBot/bartender.arguments
   become: yes
   become_user: bartender
   register: stat_result
   tags:
     - bartender
 
-- name: Reading a new Slack token
+- name: Reading new arguments (includingSlack token)
   pause:
-    prompt: Enter new slack token
-  register: slack_token
+    prompt: Enter new arguments ([-e ERROR_CHANNEL] [-m ERROR_MENTION] SLACK_TOKEN)
+  register: bartender_arguments
   when: not stat_result.stat.exists
   tags:
     - bartender
 
-- name: Writing Slack token to file
+- name: Writing arguments to file
   copy:
-    content: "{{ slack_token.user_input }}"
-    dest: /home/bartender/Code/OpenSource/SlackBot/bartender.token
+    content: "{{ bartender_arguments.user_input }}"
+    dest: /home/bartender/Code/OpenSource/SlackBot/bartender.arguments
   become: yes
   become_user: bartender
   when: not stat_result.stat.exists

@@ -26,7 +26,7 @@
 ##### Settings #####
 
 COMMAND=SlackBot/Bartender.py
-TOKEN=$(cat bartender.token)
+ARGUMENTS=$(cat bartender.arguments)
 
 ##### Helpers #####
 
@@ -50,7 +50,7 @@ function start {
 	fi
 
 	echo "Starting..."
-	nohup $PROCESS $TOKEN &
+	nohup $PROCESS $ARGUMENTS &
 	sleep 1
 
 	PROCESSES=$(get_processes)
