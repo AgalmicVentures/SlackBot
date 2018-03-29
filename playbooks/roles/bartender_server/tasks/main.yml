@@ -42,7 +42,7 @@
 
 - name: Creating virtual environment
   pip:
-    virtualenv: /home/bartender/Code/OpenSource/SlackBot/myenv
+    virtualenv: /home/bartender/Code/OpenSource/SlackBot/env
     virtualenv_command: pyvenv
     requirements: /home/bartender/Code/OpenSource/SlackBot/requirements.txt
   become: yes

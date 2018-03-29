@@ -45,8 +45,8 @@ function start {
 	fi
 
 	#Automatically source a virtual environment if available
-	if [ -e myenv ]; then
-		source myenv/bin/activate
+	if [ -e env/ ]; then
+		source env/bin/activate
 	fi
 
 	echo "Starting..."
