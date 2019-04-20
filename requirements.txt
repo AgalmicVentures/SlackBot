@@ -1,8 +1,8 @@
-certifi==2019.3.9
+certifi==2018.10.15
 chardet==3.0.4
-idna==2.8
-requests==2.21.0
-six==1.12.0
-slacksocket==1.0.0
+idna==2.7
+requests==2.20.0
+six==1.11.0
+slacksocket==0.9.1
 urllib3==1.24.2
-websocket-client==0.56.0
+websocket-client==0.46.0
