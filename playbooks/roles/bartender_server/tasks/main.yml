@@ -61,7 +61,7 @@
   tags:
     - bartender
 
-- name: Reading new arguments (includingSlack token)
+- name: Reading new arguments (including Slack token)
   pause:
     prompt: Enter new arguments ([-e ERROR_CHANNEL] [-m ERROR_MENTION] SLACK_TOKEN)
   register: bartender_arguments
